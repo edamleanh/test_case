@@ -1,0 +1,57 @@
+from selenium import webdriver
+from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from config import CHROME_DRIVER_PATH, BASE_URL, USERNAME, PASSWORD, DEFAULT_TIMEOUT
+
+
+# Edge WebDriver setup
+service = EdgeService(executable_path=CHROME_DRIVER_PATH)
+driver = webdriver.Chrome(service=service)
+
+
+# Open your Moodle site
+driver.get(BASE_URL)
+
+
+try:
+    # Step 1: Click the "Log in" link
+    login_button = WebDriverWait(driver, DEFAULT_TIMEOUT).until(
+        EC.element_to_be_clickable((By.LINK_TEXT, "Log in"))
+    )
+    login_button.click()
+
+
+    # Step 2: Wait for username/password fields
+    username_input = WebDriverWait(driver, DEFAULT_TIMEOUT).until(
+        EC.presence_of_element_located((By.ID, "username"))
+    )
+    password_input = driver.find_element(By.ID, "password")
+
+
+    # Enter credentials
+    username_input.send_keys("fakeuser")
+    password_input.send_keys("Ducanh12a1" + Keys.RETURN)
+
+
+    # Optional: Confirm login worked by checking for "Dashboard" link
+    WebDriverWait(driver, DEFAULT_TIMEOUT).until(
+        EC.presence_of_element_located((By.LINK_TEXT, "Invalid login, please try again"))
+    )
+    print("❌ Invalid login, please try again")
+
+
+except Exception as e:
+    print("❌ Login failed or an element was not found.")
+    print("Error:", e)
+
+
+# Keep browser open for inspection
+input("🔎 Press Enter to close the browser...")
+
+
+driver.quit()
+
+
